@@ -3910,6 +3910,15 @@ TEST_F(AddEntropyTest, AddLargeEntropy) {
     EXPECT_EQ(ErrorCode::OK, keymaster().addRngEntropy(HidlBuf(string(2 * 1024, 'a'))));
 }
 
+/*
+ * AddEntropyTest.AddOversizedEntropy
+ *
+ * Verifies that the addRngEntropy method blows up when given an oversized amount of data.
+ */
+TEST_F(AddEntropyTest, AddOversizedEntropy) {
+    EXPECT_EQ(ErrorCode::INVALID_INPUT_LENGTH, keymaster().addRngEntropy(HidlBuf(string(3 * 1024, 'a'))));
+}
+
 typedef KeymasterHidlTest AttestationTest;
 
 /*
