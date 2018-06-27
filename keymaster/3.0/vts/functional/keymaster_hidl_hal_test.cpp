@@ -1132,6 +1132,41 @@ TEST_F(NewKeyGenerationTest, Rsa) {
 }
 
 /*
+ * NewKeyGenerationTest.RsaNo3072
+ *
+ * Verifies that keymaster can generate all required RSA key sizes except 3072, and that the resulting keys have
+ * correct characteristics.
+ */
+TEST_F(NewKeyGenerationTest, RsaNo3072) {
+    for (auto key_size : {1024, 2048, 4096}) {
+        HidlBuf key_blob;
+        KeyCharacteristics key_characteristics;
+        ASSERT_EQ(ErrorCode::OK, GenerateKey(AuthorizationSetBuilder()
+                                                 .RsaSigningKey(key_size, 3)
+                                                 .Digest(Digest::NONE)
+                                                 .Padding(PaddingMode::NONE)
+                                                 .Authorizations(UserAuths()),
+                                             &key_blob, &key_characteristics));
+
+        ASSERT_GT(key_blob.size(), 0U);
+        CheckBaseParams(key_characteristics);
+
+        AuthorizationSet crypto_params;
+        if (IsSecure()) {
+            crypto_params = key_characteristics.teeEnforced;
+        } else {
+            crypto_params = key_characteristics.softwareEnforced;
+        }
+
+        EXPECT_TRUE(crypto_params.Contains(TAG_ALGORITHM, KM_ALGORITHM_RSA));
+        EXPECT_TRUE(crypto_params.Contains(TAG_KEY_SIZE, key_size));
+        EXPECT_TRUE(crypto_params.Contains(TAG_RSA_PUBLIC_EXPONENT, 3));
+
+        CheckedDeleteKey(&key_blob);
+    }
+}
+
+/*
  * NewKeyGenerationTest.RsaNoDefaultSize
  *
  * Verifies that failing to specify a key size for RSA key generation returns UNSUPPORTED_KEY_SIZE.
