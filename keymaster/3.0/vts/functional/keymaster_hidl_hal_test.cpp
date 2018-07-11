@@ -1102,7 +1102,9 @@ class NewKeyGenerationTest : public KeymasterHidlTest {
             EXPECT_TRUE(auths.Contains(TAG_OS_PATCHLEVEL, os_patch_level()))
                 << "OS patch level is " << os_patch_level() << " key reported "
                 << auths.GetTagValue(TAG_OS_PATCHLEVEL);
-        }
+            std::cout << "OS version is " << os_version() << " key reported "
+                << auths.GetTagValue(TAG_OS_VERSION) << std::endl;
+         }
     }
 };
 
