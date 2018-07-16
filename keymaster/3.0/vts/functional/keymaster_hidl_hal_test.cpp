@@ -440,8 +440,6 @@ class KeymasterHidlTest : public ::testing::VtsHalHidlTargetTestBase {
         keymaster_ = ::testing::VtsHalHidlTargetTestBase::getService<IKeymasterDevice>(
             KeymasterHidlEnvironment::Instance()->getServiceName<IKeymasterDevice>());
         ASSERT_NE(keymaster_, nullptr);
-        keymaster_ = ::testing::VtsHalHidlTargetTestBase::getService<IKeymasterDevice>("optee");
-        ASSERT_NE(keymaster_, nullptr);
 
         ASSERT_TRUE(
             keymaster_
