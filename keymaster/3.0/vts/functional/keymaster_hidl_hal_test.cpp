@@ -439,6 +439,7 @@ class KeymasterHidlTest : public ::testing::VtsHalHidlTargetTestBase {
     static void SetUpTestCase() {
         keymaster_ = ::testing::VtsHalHidlTargetTestBase::getService<IKeymasterDevice>(
             KeymasterHidlEnvironment::Instance()->getServiceName<IKeymasterDevice>());
+        std::cout << "Service Name: " << KeymasterHidlEnvironment::Instance()->getServiceName<IKeymasterDevice>() << std::endl;
         ASSERT_NE(keymaster_, nullptr);
 
         ASSERT_TRUE(
