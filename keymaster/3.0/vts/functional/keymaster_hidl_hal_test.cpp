@@ -1114,6 +1114,8 @@ class NewKeyGenerationTest : public KeymasterHidlTest {
             EXPECT_TRUE(auths.Contains(TAG_OS_PATCHLEVEL, os_patch_level()))
                 << "OS patch level is " << os_patch_level() << " key reported "
                 << auths.GetTagValue(TAG_OS_PATCHLEVEL);
+            std::cout << "OS version is " << os_version() << " key reported "
+                << auths.GetTagValue(TAG_OS_VERSION) << std::endl;
         }
     }
 };
@@ -2247,6 +2249,7 @@ TEST_F(VerificationOperationsTest, HmacSigningKeyCannotVerify) {
 
     HidlBuf signing_key, verification_key;
     KeyCharacteristics signing_key_chars, verification_key_chars;
+    std::cout << "Start" << std::endl;
     EXPECT_EQ(ErrorCode::OK,
               ImportKey(AuthorizationSetBuilder()
                             .Authorization(TAG_NO_AUTH_REQUIRED)
@@ -2255,6 +2258,7 @@ TEST_F(VerificationOperationsTest, HmacSigningKeyCannotVerify) {
                             .Digest(Digest::SHA1)
                             .Authorization(TAG_MIN_MAC_LENGTH, 160),
                         KeyFormat::RAW, key_material, &signing_key, &signing_key_chars));
+    std::cout << "ImportKey1" << std::endl;
     EXPECT_EQ(ErrorCode::OK,
               ImportKey(AuthorizationSetBuilder()
                             .Authorization(TAG_NO_AUTH_REQUIRED)
@@ -2263,21 +2267,25 @@ TEST_F(VerificationOperationsTest, HmacSigningKeyCannotVerify) {
                             .Digest(Digest::SHA1)
                             .Authorization(TAG_MIN_MAC_LENGTH, 160),
                         KeyFormat::RAW, key_material, &verification_key, &verification_key_chars));
+    std::cout << "ImportKey2" << std::endl;
 
     string message = "This is a message.";
     string signature = SignMessage(
         signing_key, message,
         AuthorizationSetBuilder().Digest(Digest::SHA1).Authorization(TAG_MAC_LENGTH, 160));
+    std::cout << "SignMessage" << std::endl;
 
     // Signing key should not work.
     AuthorizationSet out_params;
     EXPECT_EQ(ErrorCode::INCOMPATIBLE_PURPOSE,
               Begin(KeyPurpose::VERIFY, signing_key, AuthorizationSetBuilder().Digest(Digest::SHA1),
                     &out_params, &op_handle_));
+    std::cout << "Begin" << std::endl;
 
     // Verification key should work.
     VerifyMessage(verification_key, message, signature,
                   AuthorizationSetBuilder().Digest(Digest::SHA1));
+    std::cout << "VerifyMessage" << std::endl;
 
     CheckedDeleteKey(&signing_key);
     CheckedDeleteKey(&verification_key);
